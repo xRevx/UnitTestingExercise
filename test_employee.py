@@ -1,6 +1,6 @@
 import pytest
 
-import Employee
+from Employee import Employee
 
 
 @pytest.fixture()
@@ -13,6 +13,7 @@ def test_init(employee: Employee):
     assert employee.age == 17
     assert employee.salary == 5000
     assert employee.email == "oriaviad2006@gmail.com"
+
 
 
 # forename needs to be the first word in the full name

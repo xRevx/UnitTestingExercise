@@ -18,19 +18,19 @@ class Employee:
         self.age += 1
 
     def raise_salary(self, amount: int):
-        if amount < 0:
+        if amount < 1:
             raise ValueError('can not lower salary')
         else:
-            self.salary += amount
+            self.salary *= amount  # intentional to see fails
 
     def is_valid_email(self):
         # has to have @
         if not self.email.__contains__('@'):
-            raise NameError('email does not contain @')
+            raise ValueError('email does not contain @')
         else:
             # has to have at least 6 characters before @
             name = self.email.split("@")[0]
             if len(name) < 6:
-                raise NameError('email too short')
+                raise ValueError('email too short')
 
         return True

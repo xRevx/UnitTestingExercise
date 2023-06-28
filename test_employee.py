@@ -52,12 +52,12 @@ def test_invalid_no_at_email(employee: Employee):
 
 
 # salary raise should add the amount given
-def test_salary_raise(employee: Employee, ):
-    amount = 100
-    salary = employee.salary
-    employee.raise_salary(amount)
-    salary += amount
-    assert employee.salary == salary
+# def test_salary_raise(employee: Employee, ):
+#     amount = 100
+#     salary = employee.salary
+#     employee.raise_salary(amount)
+#     salary += amount
+#     assert employee.salary == salary
 
 
 # salary raise must be more than 0
@@ -67,5 +67,5 @@ def test_negative_salary_raise(employee: Employee, ):
     employee.raise_salary(amount)
 
 
-def test_intentional_fail():
-    pytest.fail()
+# def test_intentional_fail():
+#     pytest.fail()

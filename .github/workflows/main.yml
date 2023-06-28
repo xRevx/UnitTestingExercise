@@ -7,9 +7,6 @@ on:
 
 jobs:
   run-tests:
-    env:
-      log_Output: README.md
-      temp_log: temp_log.txt
     strategy:
       fail-fast: false
       matrix:
@@ -23,6 +20,9 @@ jobs:
 
     name: Test
     runs-on: ${{matrix.os}}
+    env:
+      log_Output: README.md
+      temp_log: temp_log.txt
 
     steps:
       - name: Set up python
@@ -49,11 +49,11 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: checkout master
+      - name: checkout main
         if  : success() || failure()
         run : |
           git fetch
-          git checkout master
+          git checkout main
 
       - name: append log to README
         if  : success() || failure()
@@ -69,4 +69,4 @@ jobs:
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+

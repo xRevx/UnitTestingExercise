@@ -11,30 +11,26 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version:
-          - "3.11"
+          - "3.9"
 
     name: Test
     runs-on: ${{matrix.os}}
     env:
       log_Output: README.md
-      temp_log: temp_log.txt
 
     steps:
 
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+
       - name: Set up python
         uses: actions/setup-python@v4
         with:
           python-version: ${{matrix.python-version}}
-
     
 
       - name: Install pytest
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install pytest
+        run: pip install -U pytest
 
       - name: Run pytest
         run: pytest > temp_log.txt

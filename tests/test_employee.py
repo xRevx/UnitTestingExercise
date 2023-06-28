@@ -1,6 +1,6 @@
 import pytest
 
-from company import Employee
+from company.Employee import Employee
 
 
 @pytest.fixture()
@@ -11,7 +11,7 @@ def employee():
 def test_init(employee: Employee):
     assert employee.name == "Ori Aviad"
     assert employee.age == 17
-    assert employee.salary == 4000
+    assert employee.salary == 5000
     assert employee.email == "oriaviad2006@gmail.com"
 
 

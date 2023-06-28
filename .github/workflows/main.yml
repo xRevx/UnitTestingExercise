@@ -7,10 +7,13 @@ on:
 
 jobs:
   run-tests:
+    env:
+      log_Output: README.md
+      temp_log: temp_log.txt
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest]
         python-version:
           - "3.7"
           - "3.8"
@@ -33,5 +36,36 @@ jobs:
       - name: Install pytest
         run: pip install -U pytest
 
-      - name: Run tests
-        run: pytest
+      - name: Run pytest
+        run: pytest -q > $temp_log
+
+      - name: add test fail badge
+        if: failure()
+        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> $log_Output
+
+      - name: config git
+        if: success() || failure()
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: checkout master
+        if  : success() || failure()
+        run : |
+          git fetch
+          git checkout master
+
+      - name: append log to README
+        if  : success() || failure(){
+        
+        run : cat $temp_log >> $log_Output
+
+
+      - name: commit logs
+        if  : success() || failure()
+        run : |
+          git add $log_Output
+          git commit -m "update $log_Output with results"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

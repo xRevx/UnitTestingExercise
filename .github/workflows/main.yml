@@ -20,6 +20,9 @@ jobs:
       - name: Run pytest
         run : pytest -q > $temp_log
 
+      - name: Run pytest std
+        run : pytest 
+
       # add failure badge if the test failed
       - name: add test fail badge
         if  : failure()

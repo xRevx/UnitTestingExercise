@@ -16,3 +16,8 @@ E   ModuleNotFoundError: No module named 'Employee'
 ERROR tests/test_employee.py
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
 1 error in 0.07s
+.....xxx                                                                 [100%]
+5 passed, 3 xfailed in 0.03s
+
+## __results from 2023-06-28__ testing -> master ![Static Badge](https://img.shields.io/badge/test-pass-green)
+

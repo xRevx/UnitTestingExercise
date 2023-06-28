@@ -8,6 +8,7 @@ jobs:
     env:
       log_Output: README.md
       temp_log: temp_log.txt
+      status_log: status_log.txt
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -24,12 +25,12 @@ jobs:
       # add failure badge if the test failed
       - name: add test fail badge
         if  : failure()
-        run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> $temp_log
+        run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> $status_log
 
       # add pass badge if the test didn't fail
       - name: add test pass badge
         if  : success()
-        run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> $temp_log
+        run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> $status_log
 
       - name: config git
         if  : success() || failure()
@@ -47,7 +48,9 @@ jobs:
 
       - name: append log to README
         if  : success() || failure()
-        run : cat $temp_log >> $log_Output
+        run : |
+          cat $status_log >> $log_Output
+          cat $temp_log >> $log_Output
 
       - name: commit logs
         if  : success() || failure()

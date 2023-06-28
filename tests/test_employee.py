@@ -1,6 +1,6 @@
 import pytest
 
-from Employee import Employee
+import Employee
 
 
 @pytest.fixture()

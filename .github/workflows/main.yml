@@ -49,7 +49,7 @@ jobs:
       - name: append log to README
         if  : success() || failure()
         run : |
-          cat $status_log >> $log_Output
+          cat $status_log > $log_Output
           cat $temp_log >> $log_Output
 
       - name: commit logs

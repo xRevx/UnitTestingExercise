@@ -34,7 +34,7 @@ jobs:
           python -m pip install pytest
 
       - name: Run pytest
-        run: pytest -q > $temp_log
+        run: pytest > $temp_log
 
       - name: add test fail badge
         if: failure()

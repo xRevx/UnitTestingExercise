@@ -56,7 +56,7 @@ jobs:
           git checkout master
 
       - name: append log to README
-        if  : success() || failure(){
+        if  : success() || failure()
         
         run : cat $temp_log >> $log_Output
 

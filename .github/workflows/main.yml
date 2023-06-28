@@ -20,13 +20,16 @@ jobs:
       temp_log: temp_log.txt
 
     steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
       - name: Set up python
         uses: actions/setup-python@v4
         with:
           python-version: ${{matrix.python-version}}
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    
 
       - name: Install pytest
         run: |

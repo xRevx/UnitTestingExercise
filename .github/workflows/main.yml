@@ -30,6 +30,9 @@ jobs:
 
 
       # runs the test and puts the output in a temporary file that will not be tracked by git
+      - name: Change working directory
+        run: cd /home/runner/work/UnitTestingExercise
+
       - name: Run pytest
         run : pytest
 

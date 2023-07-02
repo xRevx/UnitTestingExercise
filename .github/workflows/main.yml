@@ -1,13 +1,6 @@
 on:
   pull_request:
 
-env:
-  log_Output: README.md
-  temp_log: temp_log.txt
-  temp_status: temp_status.txt
-  status_log: status_log.txt
-  test_result: true
-
 jobs:
   run-tests:
     outputs:
@@ -22,7 +15,6 @@ jobs:
           - "3.11"
 
     name: python test
-    needs: checkOS
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -39,7 +31,7 @@ jobs:
 
       # runs the test and puts the output in a temporary file that will not be tracked by git
       - name: Run pytest
-        run: pytest -q > ${{ env.temp_status }}
+        run: pytest -q > temp_status.txt
 
       - name: assign_result_fail
         if: failure()
@@ -49,19 +41,19 @@ jobs:
       - name: assign_result_success
         if: success() && env.int_result == '0'
         run:
-          echo "::set-env name=int_result::11"
+          echo "::set-env name=int_result::1"
 
       - name: add failure to status
         if: failure()
         run: |
           if [ "${{ matrix.os }}" = "windows" ]; then
-            echo "${{ matrix.os }}_${{ matrix.python-version }}: failed" >> ${{ env.temp_log }}
+            echo "${{ matrix.os }}_${{ matrix.python-version }}: failed" >> temp_log.txt
           else
-            echo "${{ matrix.os }}_${{ matrix.python-version }}: failed" >> ${{ env.temp_log }}
+            echo "${{ matrix.os }}_${{ matrix.python-version }}: failed" >> temp_log.txt
           fi
 
       - name: Print status
-        run: echo ${{ env.temp_status }}
+        run: echo '$temp_status.txt'
 
   add-status:
     runs-on: ubuntu-latest
@@ -69,38 +61,38 @@ jobs:
 
     steps:
       - name: add test fail badge
-        if: env.int_result == '-1' # change to string comparison
-        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> ${{ env.status_log }}
+        if: env.int_result == '-1'
+        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> status_log.txt
 
       # add pass badge if the test didn't fail
       - name: add test pass badge
-        if: env.int_result == '1' # change to string comparison
-        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> ${{ env.status_log }}
+        if: env.int_result == '1'
+        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> status_log.txt
 
       - name: config git
-        if: env.int_result == '1' || env.int_result == '-1' # change to string comparison
+        if: env.int_result == '1' || env.int_result == '-1'
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
       # the output log will be appended to the README.md in main, so a checkout is needed
       - name: checkout main
-        if: env.int_result == '1' || env.int_result == '-1' # change to string comparison
+        if: env.int_result == '1' || env.int_result == '-1'
         run: |
           git fetch
           git checkout main
 
       - name: append log to README
-        if: env.int_result == '1' || env.int_result == '-1' # change to string comparison
+        if: env.int_result == '1' || env.int_result == '-1'
         run: |
-          cat ${{ env.status_log }} > ${{ env.log_Output }}
-          cat ${{ env.temp_log }} >> ${{ env.log_Output }}
+          cat status_log.txt > README.md
+          cat temp_log.txt >> README.md
 
       - name: commit logs
-        if: env.int_result == '1' || env.int_result == '-1' # change to string comparison
+        if: env.int_result == '1' || env.int_result == '-1'
         run: |
-          git add ${{ env.log_Output }}
-          git commit -m "update ${{ env.log_Output }} with results"
+          git add README.md
+          git commit -m "update README.md with results"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

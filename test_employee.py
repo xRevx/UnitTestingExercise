@@ -1,67 +1,36 @@
-import pytest
+class Employee:
+    def __init__(self, name: str, age: int, salary: int, email: str):
+        self.name = name
+        self.age = age
+        self.salary = salary
+        self.email = email
 
-from Employee import Employee
+    @property
+    def forename(self):
+        return self.name.split(" ")[0]
 
+    @property
+    def surname(self):
+        name = self.name.split(" ")[-1]
+        return name if name != self.forename else None
 
-@pytest.fixture()
-def employee():
-    return Employee("Ori Aviad", 17, 5000, "oriaviad2006@gmail.com")
+    def birthday_party(self):
+        self.age += 1
 
+    def raise_salary(self, amount: int):
+        if amount < 1:
+            raise ValueError('can not lower salary')
+        else:
+            self.salary += amount  # intentional to see fails
 
-def test_init(employee: Employee):
-    assert employee.name == "Ori Aviad"
-    assert employee.age == 17
-    assert employee.salary == 5000
-    assert employee.email == "oriaviad2006@gmail.com"
+    def is_valid_email(self):
+        # has to have @
+        if not self.email.__contains__('@'):
+            raise ValueError('email does not contain @')
+        else:
+            # has to have at least 6 characters before @
+            name = self.email.split("@")[0]
+            if len(name) < 6:
+                raise ValueError('email too short')
 
-
-# forename needs to be the first word in the full name
-def test_forename(employee: Employee):
-    assert employee.forename == "Ori"
-
-
-# surname is the second word in the full name
-def test_surname(employee: Employee):
-    assert employee.surname == "Aviad"
-
-
-# employee can have no surname check if surname is none
-def test_no_surname(employee: Employee):
-    employee.name = "Ori"
-    assert not employee.surname
-
-
-# birthday party +1 employee age
-def test_birthday_party(employee: Employee):
-    employee.birthday_party()
-    assert employee.age == 18
-
-
-# length before @ in the email must be >=6
-@pytest.mark.xfail(raises=ValueError)
-def test_invalid_short_email(employee: Employee):
-    employee.email = "ori@"
-    employee.is_valid_email()
-
-
-# email must include @
-@pytest.mark.xfail(raises=ValueError)
-def test_invalid_no_at_email(employee: Employee):
-    employee.email = "ori"
-    employee.is_valid_email()
-
-
-# salary raise should add the amount given
-def test_salary_raise(employee: Employee, ):
-    amount = 100
-    salary = employee.salary
-    employee.raise_salary(amount)
-    salary += amount
-    assert employee.salary == salary
-
-
-# salary raise must be more than 0
-@pytest.mark.xfail(raises=ValueError)
-def test_negative_salary_raise(employee: Employee, ):
-    amount = -100
-    employee.raise_salary(amount)
+        return True

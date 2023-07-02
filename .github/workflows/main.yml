@@ -119,7 +119,8 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         python-versions: ['3.9','3.10','3.11']
     steps:
-      - uses: actions/checkout@v3
+      - name: checkout repo
+        uses: actions/checkout@v3
       - name: Install pytest
         run: pip install -U pytest
 

@@ -127,7 +127,7 @@ jobs:
 
       # runs the test and puts the output in a temporary file that will not be tracked by git
       - name: Run pytest
-        run : pytest -q
+        run : pytest
 
 
       # add failure badge if the test failed

@@ -17,7 +17,7 @@ def test_init(employee: Employee):
 
 # forename needs to be the first word in the full name
 def test_forename(employee: Employee):
-    assert employee.forename == "Ori"
+    assert employee.forename == "Oi"
 
 
 # surname is the second word in the full name

@@ -2,18 +2,20 @@
 on:
   pull_request:
 
-env:
-  log_Output: README.md
-  temp_log: temp_log.txt
-  status_log: status_log.txt
+
 
 jobs:
   run-tests:
     runs-on : ${{matrix.os}}
     strategy:
+
       matrix:
         os: [ubuntu-latest, windows-latest]
         python-versions: ['3.9','3.10','3.11']
+    env:
+      log_Output: README.md
+      temp_log: temp_log.txt
+      status_log: status_log.txt
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -41,6 +43,10 @@ jobs:
   put-on-github:
     runs-on: ubuntu-latest
     needs: run-tests
+    env:
+      log_Output: README.md
+      temp_log: temp_log.txt
+      status_log: status_log.txt
     steps:
       - name: add test fail badge
         if  : failure()

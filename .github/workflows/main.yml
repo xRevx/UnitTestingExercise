@@ -26,7 +26,7 @@ jobs:
       - name: Install pytest
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pytest
+          pip install -U pytest
 
 
       # runs the test and puts the output in a temporary file that will not be tracked by git

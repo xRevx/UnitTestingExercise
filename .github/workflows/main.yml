@@ -101,31 +101,38 @@
 #          git push
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+name: tests
+
 on:
   pull_request:
 
 jobs:
   test:
-    name: python test
-    runs-on : ubuntu-latest
+    runs-on : ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-versions: ['3.9','3.10','3.11']
     env:
       log_Output: README.md
       temp_log: temp_log.txt
       status_log: status_log.txt
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
 
+    steps:
+      - uses: actions/checkout@v3
       - name: Install pytest
         run: pip install -U pytest
 
 
       # runs the test and puts the output in a temporary file that will not be tracked by git
       - name: Run pytest
-        run : pytest -q > $temp_log
+        run : pytest -q > $status_log
 
 
       # add failure badge if the test failed
+  put-on-github:
+    runs-on: ubuntu-latest
+    steps:
       - name: add test fail badge
         if  : failure()
         run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> $status_log

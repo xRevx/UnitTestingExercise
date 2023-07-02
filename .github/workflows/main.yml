@@ -1,71 +1,106 @@
-name: CI
-
 on:
-  push:
   pull_request:
 
+env:
+  log_Output: README.md
+  temp_log: temp_log.txt
+  temp_status: temp_status.txt
+  status_log: status_log.txt
+  test_result: true
 
 jobs:
   run-tests:
-    env:
-      log_Output: README.md
-      temp_log: temp_log.txt
+    outputs:
+      int_result: ${{ job.steps.run-tests.outputs.int_result }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version:
-          - "3.7"
-          - "3.8"
           - "3.9"
           - "3.10"
           - "3.11"
 
-    name: Test
-    runs-on: ${{matrix.os}}
+    name: python test
+    needs: checkOS
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Set up python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{matrix.python-version}}
-
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Install pytest
         run: pip install -U pytest
 
+      # runs the test and puts the output in a temporary file that will not be tracked by git
       - name: Run pytest
-        run: pytest -q > $temp_log
+        run: pytest -q > ${{ env.temp_status }}
 
-      - name: add test fail badge
+      - name: assign_result_fail
         if: failure()
-        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> $log_Output
+        run:
+          echo "::set-env name=int_result::-1"
+
+      - name: assign_result_success
+        if: success() && env.int_result == '0'
+        run:
+          echo "::set-env name=int_result::11"
+
+      - name: add failure to status
+        if: failure()
+        run: |
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            echo "${{ matrix.os }}_${{ matrix.python-version }}: failed" >> ${{ env.temp_log }}
+          else
+            echo "${{ matrix.os }}_${{ matrix.python-version }}: failed" >> ${{ env.temp_log }}
+          fi
+
+      - name: Print status
+        run: echo ${{ env.temp_status }}
+
+  add-status:
+    runs-on: ubuntu-latest
+    needs: run-tests
+
+    steps:
+      - name: add test fail badge
+        if: env.int_result == '-1' # change to string comparison
+        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> ${{ env.status_log }}
+
+      # add pass badge if the test didn't fail
+      - name: add test pass badge
+        if: env.int_result == '1' # change to string comparison
+        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> ${{ env.status_log }}
 
       - name: config git
-        if: success() || failure()
+        if: env.int_result == '1' || env.int_result == '-1' # change to string comparison
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: checkout master
-        if  : success() || failure()
-        run : |
+      # the output log will be appended to the README.md in main, so a checkout is needed
+      - name: checkout main
+        if: env.int_result == '1' || env.int_result == '-1' # change to string comparison
+        run: |
           git fetch
-          git checkout master
+          git checkout main
 
       - name: append log to README
-        if  : success() || failure()
-        
-        run : cat $temp_log >> $log_Output
-
+        if: env.int_result == '1' || env.int_result == '-1' # change to string comparison
+        run: |
+          cat ${{ env.status_log }} > ${{ env.log_Output }}
+          cat ${{ env.temp_log }} >> ${{ env.log_Output }}
 
       - name: commit logs
-        if  : success() || failure()
-        run : |
-          git add $log_Output
-          git commit -m "update $log_Output with results"
+        if: env.int_result == '1' || env.int_result == '-1' # change to string comparison
+        run: |
+          git add ${{ env.log_Output }}
+          git commit -m "update ${{ env.log_Output }} with results"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -36,7 +36,7 @@ jobs:
 #        run: cd /home/runner/work/UnitTestingExercise
 
       - name: Run pytest
-        run : pytest -q >> $temp_log.txt
+        run : pytest -q >> $temp_log
 
 
       # add failure badge if the test failed

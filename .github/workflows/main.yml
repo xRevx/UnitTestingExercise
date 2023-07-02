@@ -1,7 +1,15 @@
 on:
   pull_request:
 
+env:
+  log_Output: README.md
+  temp_log: temp_log.txt
+  temp_status: temp_status.txt
+  status_log: status_log.txt
+  test_result: true
+
 jobs:
+
   run-tests:
     outputs:
       int_result: ${{ job.steps.run-tests.outputs.int_result }}
@@ -31,7 +39,7 @@ jobs:
 
       # runs the test and puts the output in a temporary file that will not be tracked by git
       - name: Run pytest
-        run: pytest -q > temp_status.txt
+        run: pytest -q > $temp_status.txt
 
       - name: assign_result_fail
         if: failure()
@@ -58,35 +66,34 @@ jobs:
   add-status:
     runs-on: ubuntu-latest
     needs: run-tests
-
     steps:
       - name: add test fail badge
-        if: env.int_result == '-1'
-        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> status_log.txt
+        if: steps.run-tests.outputs.int_result == '-1'
+        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> {{ env.status_log }}
 
       # add pass badge if the test didn't fail
       - name: add test pass badge
-        if: env.int_result == '1'
-        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> status_log.txt
+        if: steps.run-tests.outputs.int_result == '1'
+        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> {{ env.status_log }}
 
       - name: config git
-        if: env.int_result == '1' || env.int_result == '-1'
+        if: steps.run-tests.outputs.int_result == '1' || steps.run-tests.outputs.int_result == '-1'
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
       # the output log will be appended to the README.md in main, so a checkout is needed
       - name: checkout main
-        if: env.int_result == '1' || env.int_result == '-1'
+        if: steps.run-tests.outputs.int_result == '1' || steps.run-tests.outputs.int_result == '-1'
         run: |
           git fetch
           git checkout main
 
       - name: append log to README
-        if: env.int_result == '1' || env.int_result == '-1'
+        if: steps.run-tests.outputs.int_result == '1' || steps.run-tests.outputs.int_result == '-1'
         run: |
-          cat status_log.txt > README.md
-          cat temp_log.txt >> README.md
+          cat {{ env.status_log }} > {{ env.log_Output }}
+          cat {{ env.temp_log }} >> {{ env.log_Output }}
 
       - name: commit logs
         if: env.int_result == '1' || env.int_result == '-1'

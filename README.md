@@ -1,31 +1,23 @@
 
-## __results from 2023-06-28__ testing -> main ![Static Badge](https://img.shields.io/badge/test-fail-red)
+## __results from 2023-07-02__ yaml -> main ![Static Badge](https://img.shields.io/badge/test-fail-red)
 
-.....xxFxF                                                               [100%]
+.F...xx.x                                                                [100%]
 =================================== FAILURES ===================================
-______________________________ test_salary_raise _______________________________
+________________________________ test_forename _________________________________
 
-employee = <Employee.Employee object at 0x7f413aa028c0>
+employee = <Employee.Employee object at 0x7fb5c2029840>
 
-    def test_salary_raise(employee: Employee, ):
-        amount = 100
-        salary = employee.salary
-        employee.raise_salary(amount)
-        salary += amount
->       assert employee.salary == salary
-E       assert 500000 == 5100
-E        +  where 500000 = <Employee.Employee object at 0x7f413aa028c0>.salary
+    def test_forename(employee: Employee):
+>       assert employee.forename == "Oi"
+E       AssertionError: assert 'Ori' == 'Oi'
+E         - Oi
+E         + Ori
+E         ?  +
 
-test_employee.py:61: AssertionError
-____________________________ test_intentional_fail _____________________________
-
-    def test_intentional_fail():
->       pytest.fail()
-E       Failed
-
-test_employee.py:72: Failed
+test_employee.py:20: AssertionError
 =========================== short test summary info ============================
-FAILED test_employee.py::test_salary_raise - assert 500000 == 5100
- +  where 500000 = <Employee.Employee object at 0x7f413aa028c0>.salary
-FAILED test_employee.py::test_intentional_fail - Failed
-2 failed, 5 passed, 3 xfailed in 0.04s
+FAILED test_employee.py::test_forename - AssertionError: assert 'Ori' == 'Oi'
+  - Oi
+  + Ori
+  ?  +
+1 failed, 5 passed, 3 xfailed in 0.04s

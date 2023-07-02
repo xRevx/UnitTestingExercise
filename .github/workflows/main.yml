@@ -126,7 +126,7 @@ jobs:
 
       # runs the test and puts the output in a temporary file that will not be tracked by git
       - name: Run pytest
-        run : pytest -q >> $temp_log
+        run : pytest -q >> ${{ env.temp_log }}
 
 
       # add failure badge if the test failed
@@ -136,12 +136,12 @@ jobs:
     steps:
       - name: add test fail badge
         if  : failure()
-        run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> $status_log
+        run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> ${{ env.status_log }}
 
       # add pass badge if the test didn't fail
       - name: add test pass badge
         if  : success()
-        run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> $status_log
+        run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> ${{ env.status_log }}
 
       - name: config git
         if  : success() || failure()
@@ -160,13 +160,13 @@ jobs:
       - name: append log to README
         if  : success() || failure()
         run : |
-          cat $status_log > $log_Output
-          cat $temp_log >> $log_Output
+          cat ${{ env.status_log }} > ${{ env.log_Output }}
+          cat ${{ env.temp_log }}>> ${{ env.log_Output }}
 
       - name: commit logs
         if  : success() || failure()
         run : |
-          git add $log_Output
+          git add ${{ env.log_Output }}
           git commit -m "update $log_Output with results"
           git push
         env:

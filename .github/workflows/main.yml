@@ -6,13 +6,11 @@ env:
   temp_log: temp_log.txt
   temp_status: temp_status.txt
   status_log: status_log.txt
-  test_result: true
+  test_result: !!int 1
 
 jobs:
 
   run-tests:
-    outputs:
-      int_result: ${{ job.steps.run-tests.outputs.int_result }}
     strategy:
       fail-fast: false
       matrix:
@@ -68,29 +66,29 @@ jobs:
     needs: run-tests
     steps:
       - name: add test fail badge
-        if: steps.run-tests.outputs.int_result == '-1'
+        if: env.test_result  == '-1'
         run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> {{ env.status_log }}
 
       # add pass badge if the test didn't fail
       - name: add test pass badge
-        if: steps.run-tests.outputs.int_result == '1'
+        if: env.test_result  == '1'
         run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> {{ env.status_log }}
 
       - name: config git
-        if: steps.run-tests.outputs.int_result == '1' || steps.run-tests.outputs.int_result == '-1'
+        if: env.test_result  == '1' || env.test_result  == '-1'
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
       # the output log will be appended to the README.md in main, so a checkout is needed
       - name: checkout main
-        if: steps.run-tests.outputs.int_result == '1' || steps.run-tests.outputs.int_result == '-1'
+        if: env.test_result == '1' || env.test_result  == '-1'
         run: |
           git fetch
           git checkout main
 
       - name: append log to README
-        if: steps.run-tests.outputs.int_result == '1' || steps.run-tests.outputs.int_result == '-1'
+        if: env.test_result  == '1' || env.test_result  == '-1'
         run: |
           cat {{ env.status_log }} > {{ env.log_Output }}
           cat {{ env.temp_log }} >> {{ env.log_Output }}

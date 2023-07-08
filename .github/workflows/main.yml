@@ -82,7 +82,7 @@ jobs:
       - name: Add Result
         if: success() || failure()
         run: |
-          echo -e "\e[1mTest Status: ${{ job.status }}\e[0m">> README.md
+          echo -e "Test Status: ${{ job.status }}">> README.md
           echo -e '\n' >> README.md
           echo "OS: ${{matrix.os}}" >> README.md
           echo -e '\n' >> README.md
@@ -102,7 +102,8 @@ jobs:
       - name: Publish To Github
         if: success() || failure()
         run: |
-          git pull origin main
+          git fetch origin main
+          git merge origin/main
           git commit -am "Update test status on README" --author="GitHub Action <action@github.com>"
           git push
 

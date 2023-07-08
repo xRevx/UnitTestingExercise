@@ -54,7 +54,7 @@ jobs:
       - name: Run pytest
         env:
           temp_log: temp_log.txt
-        run : pytest
+        run : pytest -q > $temp_log
 
 
       - name: config git
@@ -63,13 +63,30 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Update readme with results
+      - name: Checkout main
         if: success() || failure()
         run: |
           git fetch
           git checkout main
+
+      - name: Add Result
+        if: success() || failure()
+        run: |
           echo -e "Test Status: ${{ job.status }} \n OS: ${{matrix.os}} and python version: ${{matrix.python-version}} \n" >> README.md
+
+      - name: Add Result
+        env:
+          temp_log: temp_log.txt
+        if: failure()
+        run: |
+          echo -e $temp_log + '\n' >> README.md
+          
+
+      - name: Publish To Github
+        if: success() || failure()
+        run: |
           git commit -am "Update test status on README " --author="GitHub Action <action@github.com>"
           git push
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

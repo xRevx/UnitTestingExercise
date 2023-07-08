@@ -11,3 +11,12 @@ OS: ubuntu-latest
 python version: 3.11
 
 
+Test Status: success
+
+
+OS: ubuntu-latest
+
+
+python version: 3.10
+
+

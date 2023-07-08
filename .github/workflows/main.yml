@@ -99,6 +99,7 @@ jobs:
           git pull origin main
           git stash apply
           git commit -am "Update test status on README" --author="GitHub Action <action@github.com>"
+          git push origin --delete test-branch
           git push origin HEAD:test-branch
 
         env:

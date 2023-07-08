@@ -15,7 +15,6 @@ def test_init(employee: Employee):
     assert employee.email == "oriaviad2006@gmail.com"
 
 
-
 # forename needs to be the first word in the full name
 def test_forename(employee: Employee):
     assert employee.forename == "Ori"
@@ -66,3 +65,7 @@ def test_salary_raise(employee: Employee, ):
 def test_negative_salary_raise(employee: Employee, ):
     amount = -100
     employee.raise_salary(amount)
+
+
+def test_fail():
+    pytest.fail()

@@ -102,7 +102,6 @@ jobs:
       - name: Publish To Github
         if: always()
         run: |
-            git fetch
             git pull origin main
             git stash apply
             git commit -am "Update test status on README" --author="GitHub Action <action@github.com>"

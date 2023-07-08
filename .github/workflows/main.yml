@@ -79,7 +79,8 @@ jobs:
           temp_log: temp_log.txt
         if: failure()
         run: |
-          echo -e $temp_log + '\n' >> README.md
+          cat $temp_log >> README.md
+          echo -e '\n' >> README.md
           
 
       - name: Publish To Github

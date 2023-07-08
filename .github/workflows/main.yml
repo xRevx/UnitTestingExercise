@@ -68,19 +68,19 @@ jobs:
 
 
       - name: config git
-        if: success() || failure()
+        if: always()
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
       - name: Checkout main
-        if: success() || failure()
+        if: always()
         run: |
           git fetch
           git checkout main
 
       - name: Add Result
-        if: success() || failure()
+        if: always()
         run: |
           echo -e "Test Status: ${{ job.status }}">> README.md
           echo -e '\n' >> README.md
@@ -100,7 +100,7 @@ jobs:
           
 
       - name: Publish To Github
-        if: success() || failure()
+        if: always()
         run: |
           git fetch origin main
           git pull origin main

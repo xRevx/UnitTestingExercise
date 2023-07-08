@@ -35,7 +35,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-versions: ['3.11.4']
+        python-versions: ['3.9,3.10,3.11']
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -68,8 +68,7 @@ jobs:
         run: |
           git fetch
           git checkout main
-          echo "Test Status: ${{ job.status }} OS: ${{matrix.os}} and python version: ${{matrix.python-version}}" >> README.md
-          echo /n >> README.md
+          echo "Test Status: ${{ job.status }} \n OS: ${{matrix.os}} and python version: ${{matrix.python-version}} \n" >> README.md
           git commit -am "Update test status on README " --author="GitHub Action <action@github.com>"
           git push
         env:

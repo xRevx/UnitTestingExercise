@@ -102,10 +102,12 @@ jobs:
       - name: Publish To Github
         if: always()
         run: |
-          git fetch origin main
-          git pull origin main
-          git commit -am "Update test status on README" --author="GitHub Action <action@github.com>"
-          git push
+             git stash
+              git fetch origin main
+              git pull origin main
+              git stash apply
+              git commit -am "Update test status on README" --author="GitHub Action <action@github.com>"
+              git push
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

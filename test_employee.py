@@ -67,5 +67,3 @@ def test_negative_salary_raise(employee: Employee, ):
     employee.raise_salary(amount)
 
 
-def test_fail():
-    pytest.fail()

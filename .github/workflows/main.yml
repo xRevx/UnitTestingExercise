@@ -59,7 +59,7 @@ jobs:
         run: |
           pytest
         shell: bash
-        working-directory: /home/runner/work/UnitTestingExercise/
+        working-directory: /home/runner/work/UnitTestingExercise/test_employee
 
       - name: config git
         if: success() || failure()

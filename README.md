@@ -2,3 +2,12 @@
 
 ![Tests](https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/badge.svg) 
 
+[1mTest Status: success[0m
+
+
+OS: ubuntu-latest
+
+
+python version: 3.11
+
+

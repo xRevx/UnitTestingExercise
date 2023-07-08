@@ -54,7 +54,7 @@ jobs:
       - name: Run pytest
         env:
           temp_log: temp_log.txt
-        run : pytest -q > $temp_log
+        run : pytest -q -rf > $temp_log
 
 
       - name: config git

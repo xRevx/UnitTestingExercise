@@ -1,21 +1,33 @@
 
 on:
   pull_request:
-
+    branches:
+      - main
 
 
 jobs:
+  clear-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clear Readme
+        run: truncate -s 0 README.md
+
+      - name: Commit readme
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          git commit -m "Cleared readme" --author="GitHub Action <action@github.com>"
+          git push
+
   run-tests:
+    needs: clear-readme
     runs-on : ${{matrix.os}}
     strategy:
 
       matrix:
         os: [ubuntu-latest, windows-latest]
         python-versions: ['3.9','3.10','3.11']
-    env:
-      log_Output: README.md
-      temp_log: temp_log
-      status_log: status_log
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -36,52 +48,13 @@ jobs:
 #        run: cd /home/runner/work/UnitTestingExercise
 
       - name: Run pytest
-        run : pytest -q >> $temp_log
+        run : pytest -q
 
-
-      # add failure badge if the test failed
-  put-on-github:
-    runs-on: ubuntu-latest
-    needs: run-tests
-    env:
-      log_Output: README.md
-      temp_log: temp_log.txt
-      status_log: status_log.txt
-    steps:
-      - name: add test fail badge
-        if  : failure()
-        run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> ${{ env.status_log }}
-
-      # add pass badge if the test didn't fail
-      - name: add test pass badge
-        if  : success()
-        run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> ${{ env.status_log }}
-
-      - name: config git
-        if  : success() || failure()
-        run : |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Actions"
-
-      #the output log will be appended to the README.md in master so a checkout first is needed
-      - name: checkout main
-        if  : success() || failure()
-        run : |
-          git fetch
-          git checkout main
-
-
-      - name: append log to README
-        if  : success() || failure()
-        run : |
-          cat ${{ env.status_log }} > ${{ env.log_Output }}
-          cat ${{ env.temp_log }}>> ${{ env.log_Output }}
-
-      - name: commit logs
-        if  : success() || failure()
-        run : |
-          git add ${{ env.log_Output }}
-          git commit -m "update $log_Output with results"
+      - name: Update readme with results
+        run: |
+          echo "Test Status: ${{ job.status }}" >> README.md
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          git commit -m "Update test status on README" --author="GitHub Action <action@github.com>"
           git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

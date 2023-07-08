@@ -1,13 +1,15 @@
+
 on:
   pull_request:
     branches:
       - main
 
+
 jobs:
   clear-readme:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
+      - name: checkout repo
         uses: actions/checkout@v3
 
       - name: Clear Readme
@@ -17,10 +19,10 @@ jobs:
         run: echo -e "![Tests](https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/badge.svg) \n" >> README.md
         shell: bash
 
-      - name: Config git
+      - name: config git
         run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Actions"
+           git config --global user.email "action@github.com"
+           git config --global user.name "GitHub Actions"
 
       - name: Commit readme
         run: |
@@ -33,36 +35,39 @@ jobs:
 
   run-tests:
     needs: clear-readme
-    runs-on: ${{ matrix.os }}
+    runs-on : ${{matrix.os}}
+
     strategy:
       matrix:
         os: [ubuntu-latest]
         python-version: ['3.9', '3.10', '3.11']
     steps:
-      - name: Checkout repo
+      - name: checkout repo
         uses: actions/checkout@v3
 
       - name: Install python
         uses: actions/setup-python@v3
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{matrix.python-version}}
 
       - name: Install pytest
         run: |
           pip install -U pytest
-
+          
       - name: Acquire lock
         id: acquire_lock
         run: |
           while [ -f lockfile ]; do sleep 5; done
           echo "Lock" > lockfile
 
+      # runs the test and puts the output in a temporary file that will not be tracked by git
       - name: Run pytest
         env:
           temp_log: temp_log.txt
-        run: pytest -q > $temp_log
+        run : pytest -q > $temp_log
 
-      - name: Config git
+
+      - name: config git
         if: always()
         run: |
           git config --global user.email "action@github.com"
@@ -72,17 +77,18 @@ jobs:
         if: always()
         run: |
           git fetch
-          git checkout -b test-branch origin/main
+          git checkout main
 
       - name: Add Result
         if: always()
         run: |
           echo -e "Test Status: ${{ job.status }}">> README.md
           echo -e '\n' >> README.md
-          echo "OS: ${{ matrix.os }}" >> README.md
+          echo "OS: ${{matrix.os}}" >> README.md
           echo -e '\n' >> README.md
-          echo "python version: ${{ matrix.python-version }}" >> README.md
+          echo "python version: ${{matrix.python-version}}" >> README.md
           echo -e '\n' >> README.md
+          
 
       - name: Add Result
         env:
@@ -91,20 +97,24 @@ jobs:
         run: |
           cat $temp_log >> README.md
           echo -e '\n' >> README.md
+          
 
       - name: Publish To Github
         if: always()
         run: |
-          git stash
-          git pull origin main
-          git stash apply
-          git checkout -b test-branch
-          git commit -am "Update test status on README" --author="GitHub Action <action@github.com>"
-          git push origin --delete test-branch
-          git push origin test-branch
+             git stash
+              git fetch origin main
+              git pull origin main
+              git stash apply
+              git commit -am "Update test status on README" --author="GitHub Action <action@github.com>"
+              git push
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Release lock
+        id: release_lock
+        run: rm -f lockfile
 
   cleanup:
     runs-on: ubuntu-latest

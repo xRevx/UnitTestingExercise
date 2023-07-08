@@ -13,7 +13,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Clear Readme
-        run: echo -e "$(date +'%Y-%m-%d-%H-%M-%S') \n" > README.md
+        run: |
+        echo "![Tests](https://github.com/xRevx/UnitTestingExercise/blob/main/.github/workflows/main.ymlbadge.svg)" > README.md
+        echo -e "$(date +'%Y-%m-%d-%H-%M-%S') \n" >> README.md
+
       - name: config git
         run: |
            git config --global user.email "action@github.com"
@@ -54,8 +57,7 @@ jobs:
       - name: Run pytest
         env:
           temp_log: temp_log.txt
-        run : pytest -q | sed '.....xx.xF =================================== FAILURES =================================== __________________________________ test_fail ___________________________________,$d'
-          > $temp_log
+        run : pytest -q > $temp_log
 
 
       - name: config git

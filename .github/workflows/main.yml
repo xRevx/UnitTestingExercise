@@ -3,7 +3,6 @@ on:
     branches:
       - main
 
-
 jobs:
   clear-readme:
     runs-on: ubuntu-latest
@@ -97,10 +96,9 @@ jobs:
         if: always()
         run: |
           git fetch origin main
+          git stash
           git pull origin main
-          if git stash list | grep -q "WIP on main"; then
-            git stash apply
-          fi
+          git stash apply
           git commit -am "Update test status on README" --author="GitHub Action <action@github.com>"
           git push
 

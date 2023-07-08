@@ -1,12 +1,3 @@
-2023-07-08-19-33-08 
+2023-07-08-20-32-31 
 
-Test Status: failure 
- OS: ubuntu-latest and python version: 3.11 
-
-
-
-Test Status: failure 
- OS: ubuntu-latest and python version: 3.10 
-
-
-
+![Tests](https://github.com/xRevx/UnitTestingExercise/blob/main/.github/workflows/main.yml/badge.svg)

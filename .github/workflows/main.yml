@@ -31,10 +31,8 @@ jobs:
   run-tests:
     needs: clear-readme
     runs-on : ${{matrix.os}}
-    env:
-      temp_log: temp_log.txt
-    strategy:
 
+    strategy:
       matrix:
         os: [ubuntu-latest]
         python-versions: ['3.9','3.10','3.11']
@@ -58,7 +56,11 @@ jobs:
 #        run: cd /home/runner/work/UnitTestingExercise
 
       - name: Run pytest
-        run: pytest -q > $temp_log
+        run: pytest -q > ${{ env.temp_log }}
+        shell: bash
+        env:
+          temp_log: temp_log.txt
+
       - name: config git
         if: success() || failure()
         run: |

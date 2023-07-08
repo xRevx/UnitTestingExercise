@@ -21,7 +21,7 @@ class Employee:
         if amount < 1:
             raise ValueError('can not lower salary')
         else:
-            self.salary *= amount  # intentional to see fails
+            self.salary += amount  # intentional to see fails
 
     def is_valid_email(self):
         # has to have @

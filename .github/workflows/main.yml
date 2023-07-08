@@ -9,6 +9,9 @@ jobs:
   clear-readme:
     runs-on: ubuntu-latest
     steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+
       - name: Clear Readme
         run: truncate -s 0 README.md
 

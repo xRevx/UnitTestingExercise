@@ -66,9 +66,9 @@ jobs:
       - name: Update readme with results
         if: success() || failure()
         run: |
-          echo "Test Status: ${{ job.status }} /n OS: ${{matrix.os}} and python version: ${{matrix.python-version}}/n" >> README.md
           git fetch
           git checkout main
+          echo "Test Status: ${{ job.status }} '/n' OS: ${{matrix.os}} and python version: ${{matrix.python-version}} '/n'" >> README.md
           git commit -am "Update test status on README " --author="GitHub Action <action@github.com>"
           git push
         env:

@@ -17,8 +17,8 @@ jobs:
 
       - name: Commit readme
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          export GIT_AUTHOR_NAME="GitHub Action"
+          export GIT_AUTHOR_EMAIL="action@github.com"
           git checkout ${{ github.head_ref }}
           git add README.md
           git commit -m "Cleared readme" --author="GitHub Action <action@github.com>"
@@ -57,8 +57,8 @@ jobs:
       - name: Update readme with results
         run: |
           echo "Test Status: ${{ job.status }}" >> README.md
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          export GIT_AUTHOR_NAME="GitHub Action"
+          export GIT_AUTHOR_EMAIL="action@github.com"
           git checkout ${{ github.head_ref }}
           git add README.md
           git commit -m "Update test status on README" --author="GitHub Action <action@github.com>"

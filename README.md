@@ -11,3 +11,12 @@ OS: ubuntu-latest
 python version: 3.9
 
 
+[1mTest Status: success[0m
+
+
+OS: ubuntu-latest
+
+
+python version: 3.10
+
+

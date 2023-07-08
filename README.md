@@ -1,31 +1,4 @@
-2023-07-08-23-11-32 
+2023-07-08-23-13-28 
 
-![Tests](https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/badge.svg) 
-
-Test Status: success
-
-
-OS: ubuntu-latest
-
-
-python version: 3.9
-
-
-Test Status: success
-
-
-OS: ubuntu-latest
-
-
-python version: 3.11
-
-
-Test Status: success
-
-
-OS: ubuntu-latest
-
-
-python version: 3.10
-
+[Tests](https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/badge.svg) 
 

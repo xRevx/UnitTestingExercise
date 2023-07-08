@@ -14,15 +14,20 @@ jobs:
 
       - name: Clear Readme
         run: truncate -s 0 README.md
+      - name: config git
+        run: |
+           git config --global user.email "action@github.com"
+           git config --global user.name "GitHub Actions"
 
       - name: Commit readme
         run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Actions"
-          git checkout ${{ github.head_ref }}
+          git fetch
+          git checkout main
           git add -A
           git commit -m "Cleared readme" --author="GitHub Action <action@github.com>"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   run-tests:
     needs: clear-readme
@@ -53,13 +58,20 @@ jobs:
 
       - name: Run pytest
         run : pytest -q
-
-      - name: Update readme with results
+      - name: config git
+        if: success() || failure()
         run: |
-          echo "Test Status: ${{ job.status }}" >> README.md
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
-          git checkout ${{ github.head_ref }}
+
+      - name: Update readme with results
+        if: success() || failure()
+        run: |
+          echo "Test Status: ${{ job.status }}" >> README.md
+          git fetch
+          git checkout main
           git add -A
           git commit -m "Update test status on README" --author="GitHub Action <action@github.com>"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

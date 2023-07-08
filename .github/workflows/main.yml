@@ -6,22 +6,22 @@ on:
 
 
 jobs:
-  clear-readme:
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout repo
-        uses: actions/checkout@v3
-
-      - name: Clear Readme
-        run: truncate -s 0 README.md
-
-      - name: Commit readme
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add README.md
-          git commit -m "Cleared readme" --author="GitHub Action <action@github.com>"
-          git push
+#  clear-readme:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: checkout repo
+#        uses: actions/checkout@v3
+#
+#      - name: Clear Readme
+#        run: truncate -s 0 README.md
+#
+#      - name: Commit readme
+#        run: |
+#          git config --local user.email "action@github.com"
+#          git config --local user.name "GitHub Action"
+#          git add README.md
+#          git commit -m "Cleared readme" --author="GitHub Action <action@github.com>"
+#          git push
 
   run-tests:
     needs: clear-readme

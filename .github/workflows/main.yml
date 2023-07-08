@@ -56,10 +56,11 @@ jobs:
 #        run: cd /home/runner/work/UnitTestingExercise
 
       - name: Run pytest
-        run: |
-          pytest
-        shell: bash
+        env:
+          temp_log: temp_log.txt
         working-directory: /home/runner/work/UnitTestingExercise
+        run : pytest -q > $temp_log
+
 
       - name: config git
         if: success() || failure()

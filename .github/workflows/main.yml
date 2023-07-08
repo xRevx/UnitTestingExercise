@@ -16,7 +16,7 @@ jobs:
         run: echo -e "$(date +'%Y-%m-%d-%H-%M-%S') \n" > README.md
 
       - name: Update README with badge
-        run: echo "![Tests](https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/badge.svg)" >> README.md
+        run: echo -e "![Tests](https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/badge.svg) \n" >> README.md
         shell: bash
 
       - name: config git
@@ -73,6 +73,7 @@ jobs:
         run: |
           git fetch
           git checkout main
+          git pull
 
       - name: Add Result
         if: success() || failure()

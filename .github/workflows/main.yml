@@ -20,7 +20,7 @@ jobs:
           export GIT_AUTHOR_NAME="GitHub Action"
           export GIT_AUTHOR_EMAIL="action@github.com"
           git checkout ${{ github.head_ref }}
-          git add README.md
+          git add -A
           git commit -m "Cleared readme" --author="GitHub Action <action@github.com>"
           git push
 
@@ -60,6 +60,6 @@ jobs:
           export GIT_AUTHOR_NAME="GitHub Action"
           export GIT_AUTHOR_EMAIL="action@github.com"
           git checkout ${{ github.head_ref }}
-          git add README.md
+          git add -A
           git commit -m "Update test status on README" --author="GitHub Action <action@github.com>"
           git push

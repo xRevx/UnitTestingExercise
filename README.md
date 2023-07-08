@@ -6,3 +6,6 @@ Test Status: success
 Test Status: success 
  OS: ubuntu-latest and python version: 3.11 
 
+Test Status: success 
+ OS: ubuntu-latest and python version: 3.10 
+

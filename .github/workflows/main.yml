@@ -98,9 +98,10 @@ jobs:
           git stash
           git pull origin main
           git stash apply
+          git checkout -b test-branch
           git commit -am "Update test status on README" --author="GitHub Action <action@github.com>"
           git push origin --delete test-branch
-          git push origin HEAD:test-branch
+          git push origin test-branch
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -78,7 +78,7 @@ jobs:
       - name: Add Result
         if: success() || failure()
         run: |
-          echo -e "Test Status: ${{ job.status }} \n OS: ${{matrix.os}} and python version: ${{matrix.python-version}} \n" >> README.md
+          echo -e "${bold}Test Status: ${{ job.status }} \n OS: ${{matrix.os}} and python version: ${{matrix.python-version}} \n" >> README.md
 
       - name: Add Result
         env:

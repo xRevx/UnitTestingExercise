@@ -23,8 +23,7 @@ jobs:
         run: |
           git fetch
           git checkout main
-          git add -A
-          git commit -m "Cleared readme" --author="GitHub Action <action@github.com>"
+          git commit -am "Cleared readme" --author="GitHub Action <action@github.com>"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -35,7 +34,7 @@ jobs:
     strategy:
 
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         python-versions: ['3.9','3.10','3.11']
     steps:
       - name: checkout repo
@@ -67,11 +66,10 @@ jobs:
       - name: Update readme with results
         if: success() || failure()
         run: |
-          echo "Test Status: ${{ job.status }}" >> README.md
+          echo "Test Status: ${{ job.status }} /n OS: ${{matrix.os}} and python version: ${{matrix.python-version}}/n" >> README.md
           git fetch
           git checkout main
-          git add -A
-          git commit -m "Update test status on README" --author="GitHub Action <action@github.com>"
+          git commit -am "Update test status on README " --author="GitHub Action <action@github.com>"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

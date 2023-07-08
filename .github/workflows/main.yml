@@ -96,6 +96,7 @@ jobs:
         if: always()
         run: |
           git fetch origin main
+          git pull origin main
           if git stash list | grep -q "WIP on main"; then
             git stash apply
           fi

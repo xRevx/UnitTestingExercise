@@ -53,12 +53,7 @@ jobs:
       - name: Install pytest
         run: |
           pip install -U pytest
-          
-      - name: Acquire lock
-        id: acquire_lock
-        run: |
-          while [ -f lockfile ]; do sleep 5; done
-          echo "Lock" > lockfile
+
 
       # runs the test and puts the output in a temporary file that will not be tracked by git
       - name: Run pytest
@@ -68,21 +63,22 @@ jobs:
 
 
       - name: config git
-        if: always()
+        if: success() || failure()
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
       - name: Checkout main
-        if: always()
+        if: success() || failure()
         run: |
           git fetch
           git checkout main
+          git pull
 
       - name: Add Result
-        if: always()
+        if: success() || failure()
         run: |
-          echo -e "Test Status: ${{ job.status }}">> README.md
+          echo "Test Status: ${{ job.status }}">> README.md
           echo -e '\n' >> README.md
           echo "OS: ${{matrix.os}}" >> README.md
           echo -e '\n' >> README.md
@@ -100,30 +96,10 @@ jobs:
           
 
       - name: Publish To Github
-        if: always()
+        if: success() || failure()
         run: |
-             git stash
-              git fetch origin main
-              git pull origin main
-              git stash apply
-              git commit -am "Update test status on README" --author="GitHub Action <action@github.com>"
-              git push
+          git commit -am "Update test status on README " --author="GitHub Action <action@github.com>"
+          git push
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Release lock
-        id: release_lock
-        run: rm -f lockfile
-
-  cleanup:
-    runs-on: ubuntu-latest
-    needs: [run-tests]
-    if: always()
-    steps:
-      - name: Final lock release
-        if: ${{ needs.run-tests.result == 'success' }}
-        run: |
-          while [ -f lockfile ]; do sleep 5; done
-          echo "Lock" > lockfile
-          rm -f lockfile

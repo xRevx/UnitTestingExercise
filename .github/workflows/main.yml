@@ -73,12 +73,11 @@ jobs:
         run: |
           git fetch
           git checkout main
-          git pull
 
       - name: Add Result
         if: success() || failure()
         run: |
-          echo "\033 [1mTest Status: ${{ job.status }}\033[0m">> README.md
+          echo -e "\e[1mTest Status: ${{ job.status }}\e[0m">> README.md
           echo -e '\n' >> README.md
           echo "OS: ${{matrix.os}}" >> README.md
           echo -e '\n' >> README.md
@@ -98,7 +97,7 @@ jobs:
       - name: Publish To Github
         if: success() || failure()
         run: |
-          git commit -am "Update test status on README " --author="GitHub Action <action@github.com>"
+          git pull origin main && git commit -am "Update test status on README " --author="GitHub Action <action@github.com>"
           git push
 
         env:

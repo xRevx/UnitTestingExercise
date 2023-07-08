@@ -95,7 +95,7 @@ jobs:
       - name: Publish To Github
         if: always()
         run: |
-          git pull origin main
+          git fetch origin main
           if git stash list | grep -q "WIP on main"; then
             git stash apply
           fi

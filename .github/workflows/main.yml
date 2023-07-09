@@ -15,6 +15,10 @@ jobs:
         python-version: [3.9, 3.10, 3.11]
 
     steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -47,7 +51,7 @@ jobs:
 
       - name: Update README
         run: |
-          echo "<img alt=\"Tests\" src=\"https://example.com/test-status.svg\">" >> README.md
+          echo "<img alt=\"Tests\" src=\"https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml">" >> README.md
           echo "" >> README.md
           echo "## Test Results" >> README.md
           

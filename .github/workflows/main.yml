@@ -64,18 +64,19 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
+      - name: Set cache-control headers
+        run: |
+          echo "Cache-Control: no-store" >> .github/.htaccess
+
       - name: Update README
         run: |
-          git rm -r --cached
           echo -e "$(date +'%Y-%m-%d-%H-%M-%S') \n" > README.md
           echo "" >> README.md
           echo -e "![Tests](https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/badge.svg) \n" >> README.md   
           echo "## Test Results" >> README.md
           cat test-results/pytest_report.xml >> README.md
 
-      - name: Set cache-control headers
-        run: |
-          echo "Cache-Control: no-store" >> .github/.htaccess
+ 
           
 
       - name: Commit changes

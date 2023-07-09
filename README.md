@@ -20,3 +20,6 @@ OS: ubuntu-latest
 python version: 3.9
 
 
+<img alt="Tests" src="https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/test-status.svg">
+
+## Test Results

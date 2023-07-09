@@ -40,7 +40,6 @@ jobs:
 
   update-readme:
     name: Update README with test status
-    needs: test
     runs-on: ubuntu-latest
 
     steps:

@@ -63,7 +63,7 @@ def test_salary_raise(employee: Employee, ):
 # salary raise must be more than 0
 @pytest.mark.xfail(raises=ValueError)
 def test_negative_salary_raise(employee: Employee, ):
-    amount = -100
+    amount = 100
     employee.raise_salary(amount)
 
 

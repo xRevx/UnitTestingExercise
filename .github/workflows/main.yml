@@ -58,8 +58,8 @@ jobs:
       - name: Checkout main
         if: always()
         run: |
-          git fetch
           git checkout main
+          
 
       - name: Update README
         run: |

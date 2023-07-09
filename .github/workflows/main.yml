@@ -49,6 +49,18 @@ jobs:
           name: test-results
           path: test-results
 
+      - name: config git
+        if: always()
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Checkout main
+        if: always()
+        run: |
+          git fetch
+          git checkout main
+
       - name: Update README
         run: |
           echo "<img alt=\"Tests\" src=\"https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/test-status.svg\">" >> README.md
@@ -58,8 +70,7 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Actions"
-          git add README.md
-          git commit -m "Update README with test status"
+          git commit -am "Update test status on README " --author="GitHub Action <action@github.com>"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

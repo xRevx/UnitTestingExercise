@@ -25,6 +25,7 @@ jobs:
 
       - name: Install pytest
         run: |
+          pip install --upgrade pip
           pip install -U pytest
 
       - name: Run Pytest
@@ -62,7 +63,7 @@ jobs:
 
       - name: Update README
         run: |
-          echo "<img alt=\"Tests\" src=\"https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/test-status.svg\">" >> README.md
+          echo -e "![Tests](https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/badge.svg) \n" >> README.md
           echo "" >> README.md
           echo "## Test Results" >> README.md
           

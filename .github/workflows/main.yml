@@ -25,7 +25,6 @@ jobs:
 
       - name: Install pytest
         run: |
-          pip install --upgrade pip
           pip install -U pytest
 
       - name: Run Pytest
@@ -33,7 +32,8 @@ jobs:
 
       - name: Save test results
         if: always()
-        uses: actions/upload-artifact@v3
+        id: test-results
+        uses: actions/upload-artifact@v2
         with:
           name: test-results
           path: pytest_report.xml

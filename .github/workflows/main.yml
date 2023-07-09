@@ -1,172 +1,87 @@
-#on:
-#  pull_request:
-#
-#env:
-#  log_Output: README.md
-#  temp_log: temp_log.txt
-#  temp_status: temp_status.txt
-#  status_log: status_log.txt
-#  test_result: !!int 1
-#
-#jobs:
-#
-#  run-tests:
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        os: [ubuntu-latest, macos-latest, windows-latest]
-#        python-version:
-#          - "3.9"
-#          - "3.10"
-#          - "3.11"
-#
-#    name: python test
-#    runs-on: ${{ matrix.os }}
-#
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v3
-#
-#      - name: Set up Python ${{ matrix.python-version }}
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: ${{ matrix.python-version }}
-#
-#      - name: Install pytest
-#        run: pip install -U pytest
-#
-#      # runs the test and puts the output in a temporary file that will not be tracked by git
-#      - name: Run pytest
-#        run: pytest -q > $temp_status.txt
-#
-#      - name: assign_result_fail
-#        if: failure()
-#        run:
-#          echo "::set-env name=int_result::-1"
-#
-#      - name: assign_result_success
-#        if: success() && env.int_result == '0'
-#        run:
-#          echo "::set-env name=int_result::1"
-#
-#      - name: add failure to status
-#        if: failure()
-#        run: |
-#          if [ "${{ matrix.os }}" = "windows" ]; then
-#            echo "${{ matrix.os }}_${{ matrix.python-version }}: failed" >> temp_log.txt
-#          else
-#            echo "${{ matrix.os }}_${{ matrix.python-version }}: failed" >> temp_log.txt
-#          fi
-#
-#      - name: Print status
-#        run: echo '$temp_status.txt'
-#
-#  add-status:
-#    runs-on: ubuntu-latest
-#    needs: run-tests
-#    steps:
-#      - name: add test fail badge
-#        if: env.test_result  == '-1'
-#        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> {{ env.status_log }}
-#
-#      # add pass badge if the test didn't fail
-#      - name: add test pass badge
-#        if: env.test_result  == '1'
-#        run: echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> {{ env.status_log }}
-#
-#      - name: config git
-#        if: env.test_result  == '1' || env.test_result  == '-1'
-#        run: |
-#          git config --global user.email "action@github.com"
-#          git config --global user.name "GitHub Actions"
-#
-#      # the output log will be appended to the README.md in main, so a checkout is needed
-#      - name: checkout main
-#        if: env.test_result == '1' || env.test_result  == '-1'
-#        run: |
-#          git fetch
-#          git checkout main
-#
-#      - name: append log to README
-#        if: env.test_result  == '1' || env.test_result  == '-1'
-#        run: |
-#          cat {{ env.status_log }} > {{ env.log_Output }}
-#          cat {{ env.temp_log }} >> {{ env.log_Output }}
-#
-#      - name: commit logs
-#        if: env.int_result == '1' || env.int_result == '-1'
-#        run: |
-#          git add README.md
-#          git commit -m "update README.md with results"
-#          git push
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-name: tests
+name: Automated Testing
 
 on:
   pull_request:
+    branches:
+      - main
 
 jobs:
   test:
-    runs-on : ${{matrix.os}}
+    name: Run Pytest
+    runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-versions: ['3.9','3.10','3.11']
-    env:
-      log_Output: README.md
-      temp_log: temp_log.txt
-      status_log: status_log.txt
+        python-version: ['3.9', '3.10', '3.11']
 
     steps:
-      - uses: actions/checkout@v3
+      - name: checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{matrix.python-version}}
+
       - name: Install pytest
-        run: pip install -U pytest
+        run: |
+          pip install -U pytest
 
+      - name: Run Pytest
+        run: |
+          pytest --junitxml=pytest_report.xml -q
 
-      # runs the test and puts the output in a temporary file that will not be tracked by git
-      - name: Run pytest
-        run : pytest -q > $status_log
+      - name: Save test results
+        if: always()
+        id: test-results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: pytest_report.xml
 
-
-      # add failure badge if the test failed
-  put-on-github:
+  update-readme:
+    name: Update README with test status
+    needs: test
+    if: always()
     runs-on: ubuntu-latest
-    steps:
-      - name: add test fail badge
-        if  : failure()
-        run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-fail-red)\n" >> $status_log
 
-      # add pass badge if the test didn't fail
-      - name: add test pass badge
-        if  : success()
-        run : echo -e "\n## __results from $(date +'%Y-%m-%d')__ ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }} ![Static Badge](https://img.shields.io/badge/test-pass-green)\n" >> $status_log
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: Download test results
+        uses: actions/download-artifact@v2
+        with:
+          name: test-results
+          path: /home/runner/work/UnitTestingExercise/UnitTestingExercise/test-results
+
 
       - name: config git
-        if  : success() || failure()
-        run : |
+        if: always()
+        run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
-      #the output log will be appended to the README.md in master so a checkout first is needed
-      - name: checkout main
-        if  : success() || failure()
-        run : |
-          git fetch
-          git checkout main
+      - name: Set cache-control headers
+        run: |
+          echo "Cache-Control: no-store" >> .github/.htaccess
 
+      - name: Update README
+        run: |
+          echo -e "$(date +'%Y-%m-%d-%H-%M-%S') \n" > README.md
+          echo "" >> README.md
+          echo -e "![Tests](https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/badge.svg) \n" >> README.md   
+          echo "## Test Results" >> README.md
+          cat test-results/pytest_report.xml >> README.md
 
-      - name: append log to README
-        if  : success() || failure()
-        run : |
-          cat $status_log > $log_Output
-          cat $temp_log >> $log_Output
+ 
+          
 
-      - name: commit logs
-        if  : success() || failure()
-        run : |
-          git add $log_Output
-          git commit -m "update $log_Output with results"
+      - name: Commit changes
+        run: |
+          git commit -am "Update test status on README " --author="GitHub Action <action@github.com>"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

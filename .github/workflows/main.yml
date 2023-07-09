@@ -40,6 +40,8 @@ jobs:
 
   update-readme:
     name: Update README with test status
+    needs: test
+    if: always()
     runs-on: ubuntu-latest
 
     steps:

@@ -1,105 +1,53 @@
+name: Automated Testing
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 
-
 jobs:
-  clear-readme:
+  test:
+    name: Run Pytest
     runs-on: ubuntu-latest
-    steps:
-      - name: checkout repo
-        uses: actions/checkout@v3
-
-      - name: Clear Readme
-        run: echo -e "$(date +'%Y-%m-%d-%H-%M-%S') \n" > README.md
-
-      - name: Update README with badge
-        run: echo -e "![Tests](https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/badge.svg) \n" >> README.md
-        shell: bash
-
-      - name: config git
-        run: |
-           git config --global user.email "action@github.com"
-           git config --global user.name "GitHub Actions"
-
-      - name: Commit readme
-        run: |
-          git fetch
-          git checkout main
-          git commit -am "Cleared readme" --author="GitHub Action <action@github.com>"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  run-tests:
-    needs: clear-readme
-    runs-on : ${{matrix.os}}
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: [3.9, 3.10, 3.11]
+
     steps:
-      - name: checkout repo
-        uses: actions/checkout@v3
-
-      - name: Install python
-        uses: actions/setup-python@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
         with:
-          python-version: ${{matrix.python-version}}
+          python-version: ${{ matrix.python-version }}
 
-      - name: Install pytest
+      - name: Install dependencies
+        run: pip install -U pytest
+
+      - name: Run Pytest
+        run: pytest -q
+
+      - name: Save test results
+        if: always()
+        id: test-results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: pytest_report.xml
+
+  update-readme:
+    name: Update README with test status
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download test results
+        uses: actions/download-artifact@v2
+        with:
+          name: test-results
+
+      - name: Update README
         run: |
-          pip install -U pytest
-
-
-      # runs the test and puts the output in a temporary file that will not be tracked by git
-      - name: Run pytest
-        env:
-          temp_log: temp_log.txt
-        run : pytest -q > $temp_log
-
-
-      - name: config git
-        if: success() || failure()
-        run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Actions"
-
-      - name: Checkout main
-        if: success() || failure()
-        run: |
-          git fetch
-          git checkout main
-          git pull
-
-      - name: Add Result
-        if: success() || failure()
-        run: |
-          echo "Test Status: ${{ job.status }}">> README.md
-          echo -e '\n' >> README.md
-          echo "OS: ${{matrix.os}}" >> README.md
-          echo -e '\n' >> README.md
-          echo "python version: ${{matrix.python-version}}" >> README.md
-          echo -e '\n' >> README.md
+          echo "<img alt=\"Tests\" src=\"https://example.com/test-status.svg\">" >> README.md
+          echo "" >> README.md
+          echo "## Test Results" >> README.md
           
-
-      - name: Add Result
-        env:
-          temp_log: temp_log.txt
-        if: failure()
-        run: |
-          cat $temp_log >> README.md
-          echo -e '\n' >> README.md
-          
-
-      - name: Publish To Github
-        if: success() || failure()
-        run: |
-          git commit -am "Update test status on README " --author="GitHub Action <action@github.com>"
-          git push
-
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

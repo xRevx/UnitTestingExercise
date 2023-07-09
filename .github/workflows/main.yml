@@ -68,13 +68,13 @@ jobs:
         run: |
           echo -e "$(date +'%Y-%m-%d-%H-%M-%S') \n" > README.md
           echo "" >> README.md
-          if [ -f "test-results/pytest_report.xml" ]; then
-            echo "[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/xRevx/UnitTestingExercise/actions)" >> README.md
-          else
-            echo "[![Tests](https://img.shields.io/badge/tests-failing-red)](https://github.com/xRevx/UnitTestingExercise/actions)" >> README.md
-          fi
+          echo -e "![Tests](https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/badge.svg) \n" >> README.md   
           echo "## Test Results" >> README.md
           cat test-results/pytest_report.xml >> README.md
+
+      - name: Set cache-control headers
+        run: |
+          echo "Cache-Control: no-store" >> .github/.htaccess
           
 
       - name: Commit changes

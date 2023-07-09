@@ -28,7 +28,9 @@ jobs:
           pip install -U pytest
 
       - name: Run Pytest
-        run: pytest -q
+        run: |
+          pytest -q
+          mv junit.xml pytest_report.xml
 
       - name: Save test results
         if: always()

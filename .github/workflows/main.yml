@@ -29,8 +29,7 @@ jobs:
 
       - name: Run Pytest
         run: |
-          pytest -q
-          mv junit.xml pytest_report.xml
+          pytest --junitxml=pytest_report.xml -q
 
       - name: Save test results
         if: always()

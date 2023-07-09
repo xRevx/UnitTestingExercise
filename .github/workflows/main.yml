@@ -66,6 +66,7 @@ jobs:
 
       - name: Update README
         run: |
+          git rm -r --cached
           echo -e "$(date +'%Y-%m-%d-%H-%M-%S') \n" > README.md
           echo "" >> README.md
           echo -e "![Tests](https://github.com/xRevx/UnitTestingExercise/actions/workflows/main.yml/badge.svg) \n" >> README.md   
